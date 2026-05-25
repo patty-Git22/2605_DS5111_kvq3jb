@@ -1,5 +1,83 @@
 # DS-5111_Software_And_Automation
-Course work from summer 2026 semester
 
-Goal of class:
-Code an end-to-end data science project with core software engineering and automation to quickly integrate into a corporate environment. Use version control to focus on solutions, leverage automation at your command line and in the cloud, deliver solid code by incorporating testing, lower extension and maintenance time with OOP and Design Patterns, ensuring your code's path to production to deliver a complete package to the enterprise.
+## Requirements:
+        -Log into AWS and set up a VM
+        -Make sure to select `Ubuntu Server 26.04`
+        -Get SSH key and link to personal Git repo.
+
+## Automating init and setting up virtual environment
+
+### Step 1:Automating the sequence to recreate VM
+
+1. To avoid cloud instance crashes, create a `init.sh` file by typing `nano init.sh` in root directory.
+2. Within the `init.sh` file copy and past the following:
+        -`sudo apt update` # To bring VM snapshot up to date with package versions
+        -`sudo apt install make -y` # so we can use makefiles
+        -`sudo apt install python3.14-venv -y` # so we can create python virtual environments
+        -`sudo apt install tree` # a usefull tool for listing files in tree form
+3. Save and exit. Then type `chmod +x init.sh` to make it executable, followed by `bash init.sh` to run the file.
+4. To test to make sure everything ran correctly, you can execute `tree` which will return the name of the init.sh sc>
+
+### Step 2: Github Credential Setup
+
+In order for GitHub to recognize who is issuing commits and pushes, we will set up a configuration file in scrpit to >
+
+1. Create a `init_git_cred.sh` file using `nano` like before and paste the following into the file:
+```bash
+!#/usr/bin/bash
+
+USER=<your github email>
+NAME=<your github user name>
+
+git config --global --list
+
+git config --global user.email ${USER} 
+git config --global user.name  ${NAME} 
+
+git config --global --list
+```
+2. Replace "<your github email" with the email associated with your github account. Remove ""<>"" as it is not needed.
+3. Repeat that step by inserting your github account name below in the `NAME = ` line.
+4. Exit and save. Then run the scrpit using the same process as before:
+        *make it executable: `chmod +x init_git_creds.sh`
+        *run it: `bash init_git_creds.sh`
+
+
+### Step 3: Clone Repo to the machine
+In order to save our work to our github repo, we must first clone our repository.
+We will clone our repo using `git clone <git@github.com:your_repo_name> which is found by hitting the code button fol>
+Once you have cloned your repo, move into it using `cd <path name>` and following the following steps:
+        1. Create a new directory called scripts using `mkdir scripts`.
+        2. Move into the new directory `scripts` using `cd scripts`
+        3. Move your two init files into it using:
+                - `mv ~/init.sh .`
+                - `mv ~/init_git_creds.sh .`
+        4. Now we are ready to add and commit the files using:
+                - `git add .` (you could add each one individually, as in `git add init.sh`.  The command here will a>
+                - `git commit -m "saving our two init files"`
+                - `git push`
+        5. Go to your repo page and confirm all files were pushed successfully.
+
+### Step 4: Creating a virtual environment for python and utilizing a makefile for repeatability
+
+Our last task is to acutally make the virtual environment we will be using to intall python. We will also be creating>
+
+1. Navigate back to your root directory and create a file called `makefile` and paste the following inside:
+```
+default:
+        @cat makefile
+
+env:
+        python3 -m venv env; . env/bin/activate; pip install --upgrade pip
+
+update:  env
+        . env/bin/activate; pip install -r requirements.txt
+```
+2. There is no need to make this file executable as it will run when we use the `make` command.
+3. To test to make sure it is working properly, type `make` and you should see the contents of the file echo to the console.
+4. Next, we need to make the requirements file that will house the packages we need. To do so, create a file called `requirements.txt` and past the following inside:
+```
+pandas
+numpy
+```
+Now we have everything we need and we can run `make update` to generate our virtual environment. To verify everything is working correctly, we can use `. env/bin/activate`  to activate the enviroment and see (env) to the left of the prompt. We can also confirm everything is working correctly by using `pip list` to return the installed packages, i.e numpy and pandas in this case. Lastly, make sure to push everything to your github repo using the same add/commit/push commands as before.
