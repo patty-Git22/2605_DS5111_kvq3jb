@@ -11,18 +11,19 @@
 
 1. To avoid cloud instance crashes, create a `init.sh` file by typing `nano init.sh` in root directory.
 2. Within the `init.sh` file copy and past the following:
-        -`sudo apt update` # To bring VM snapshot up to date with package versions
-        -`sudo apt install make -y` # so we can use makefiles
-        -`sudo apt install python3.14-venv -y` # so we can create python virtual environments
-        -`sudo apt install tree` # a usefull tool for listing files in tree form
-3. Save and exit. Then type `chmod +x init.sh` to make it executable, followed by `bash init.sh` to run the file.
-4. To test to make sure everything ran correctly, you can execute `tree` which will return the name of the init.sh sc>
+   -`sudo apt update` # To bring VM snapshot up to date with package versions
+   -`sudo apt install make -y` # so we can use makefiles
+   -`sudo apt install python3.14-venv -y` # so we can create python virtual environments
+   -`sudo apt install tree` # a usefull tool for listing files in tree form
+4. Save and exit. Then type `chmod +x init.sh` to make it executable, followed by `bash init.sh` to run the file.
+5. To test to make sure everything ran correctly, you can execute `tree` which will return the name of the init.sh sc>
 
 ### Step 2: Github Credential Setup
 
 In order for GitHub to recognize who is issuing commits and pushes, we will set up a configuration file in scrpit to >
 
 1. Create a `init_git_cred.sh` file using `nano` like before and paste the following into the file:
+
 ```bash
 !#/usr/bin/bash
 
@@ -36,16 +37,17 @@ git config --global user.name  ${NAME}
 
 git config --global --list
 ```
+
 2. Replace "<your github email" with the email associated with your github account. Remove ""<>"" as it is not needed.
 3. Repeat that step by inserting your github account name below in the `NAME = ` line.
 4. Exit and save. Then run the scrpit using the same process as before:
-        *make it executable: `chmod +x init_git_creds.sh`
-        *run it: `bash init_git_creds.sh`
+   *make it executable: `chmod +x init_git_creds.sh`
+   *run it: `bash init_git_creds.sh`
 
 
 ### Step 3: Clone Repo to the machine
 In order to save our work to our github repo, we must first clone our repository.
-We will clone our repo using `git clone <git@github.com:your_repo_name> which is found by hitting the code button fol>
+We will clone our repo using `git clone <git@github.com:your_repo_name>' which is found by hitting the code button fol>
 Once you have cloned your repo, move into it using `cd <path name>` and following the following steps:
         1. Create a new directory called scripts using `mkdir scripts`.
         2. Move into the new directory `scripts` using `cd scripts`
