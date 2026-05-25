@@ -47,8 +47,7 @@ git config --global --list
 
 ### Step 3: Clone Repo to the machine
 In order to save our work to our github repo, we must first clone our repository.
-We will clone our repo using `git clone <git@github.com:your_repo_name>' which is found by hitting the code button fol>
-Once you have cloned your repo, move into it using `cd <path name>` and following the following steps:
+We will clone our repo using `git clone <git@github.com:your_repo_name>` which is found by hitting the code button followed by the SSH option on your repo's main page.
         1. Create a new directory called scripts using `mkdir scripts`.
         2. Move into the new directory `scripts` using `cd scripts`
         3. Move your two init files into it using:
@@ -65,6 +64,7 @@ Once you have cloned your repo, move into it using `cd <path name>` and followin
 Our last task is to acutally make the virtual environment we will be using to intall python. We will also be creating>
 
 1. Navigate back to your root directory and create a file called `makefile` and paste the following inside:
+2. 
 ```
 default:
         @cat makefile
@@ -75,11 +75,14 @@ env:
 update:  env
         . env/bin/activate; pip install -r requirements.txt
 ```
+
 2. There is no need to make this file executable as it will run when we use the `make` command.
 3. To test to make sure it is working properly, type `make` and you should see the contents of the file echo to the console.
 4. Next, we need to make the requirements file that will house the packages we need. To do so, create a file called `requirements.txt` and past the following inside:
+5. 
 ```
 pandas
 numpy
 ```
+
 Now we have everything we need and we can run `make update` to generate our virtual environment. To verify everything is working correctly, we can use `. env/bin/activate`  to activate the enviroment and see (env) to the left of the prompt. We can also confirm everything is working correctly by using `pip list` to return the installed packages, i.e numpy and pandas in this case. Lastly, make sure to push everything to your github repo using the same add/commit/push commands as before.
