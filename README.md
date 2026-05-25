@@ -1,9 +1,9 @@
 # DS-5111_Software_And_Automation
 
 ## Requirements:
-        -Log into AWS and set up a VM
-        -Make sure to select `Ubuntu Server 26.04`
-        -Get SSH key and link to personal Git repo.
+* Log into AWS and set up a VM
+* Make sure to select `Ubuntu Server 26.04`
+* Get SSH key and link to personal Git repo.
 
 ## Automating init and setting up virtual environment
 
@@ -11,10 +11,10 @@
 
 * To avoid cloud instance crashes, create a `init.sh` file by typing `nano init.sh` in root directory.
 * Within the `init.sh` file copy and past the following:
-   -`sudo apt update` # To bring VM snapshot up to date with package versions
-   -`sudo apt install make -y` # so we can use makefiles
-   -`sudo apt install python3.14-venv -y` # so we can create python virtual environments
-   -`sudo apt install tree` # a usefull tool for listing files in tree form
+  -`sudo apt update` # To bring VM snapshot up to date with package versions
+  -`sudo apt install make -y` # so we can use makefiles
+  -`sudo apt install python3.14-venv -y` # so we can create python virtual environments
+  -`sudo apt install tree` # a usefull tool for listing files in tree form
 * Save and exit. Then type `chmod +x init.sh` to make it executable, followed by `bash init.sh` to run the file.
 * To test to make sure everything ran correctly, you can execute `tree` which will return the name of the init.sh sc>
 
@@ -41,8 +41,8 @@ git config --global --list
 * Replace "<your github email" with the email associated with your github account. Remove ""<>"" as it is not needed.
 * Repeat that step by inserting your github account name below in the `NAME = ` line.
 * Exit and save. Then run the scrpit using the same process as before:
-   *make it executable: `chmod +x init_git_creds.sh`
-   *run it: `bash init_git_creds.sh`
+  - make it executable: `chmod +x init_git_creds.sh`
+  - run it: `bash init_git_creds.sh`
 
 
 ### Step 3: Clone Repo to the machine
