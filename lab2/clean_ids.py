@@ -18,15 +18,19 @@ def validate_id(youtube_id):
     pattern = r'^[a-zA-Z0-9_-]{11}$'
     return re.match(pattern, youtube_id) is not None
 
-try:
-    for line in sys.stdin:
-        youtube_id = line.strip()
-        if not youtube_id:
-            continue
-        if validate_id(youtube_id):
-            print(youtube_id)
-        else:
-            logging.warning(f'Invalid YouTube ID: {youtube_id}')
+def main (): 
 
-except KeyboardInterrupt:
-    sys.exit(0)
+    try:
+        for line in sys.stdin:
+            youtube_id = line.strip()
+            if not youtube_id:
+                continue
+            if validate_id(youtube_id):
+                print(youtube_id)
+            else:
+                logging.warning(f'Invalid YouTube ID: {youtube_id}')
+
+    except KeyboardInterrupt:
+        sys.exit(0)
+if __name__=="__main__":
+    main()    
