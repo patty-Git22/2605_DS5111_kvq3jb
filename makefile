@@ -4,11 +4,18 @@ default:
 env:
 	python3 -m venv env; . env/bin/activate; pip install --upgrade pip
 
-update:  env
+update: env
 	. env/bin/activate; pip install -r requirements.txt
 
-lint:
-	. env/bin/activate && pylint --fail-under=9 lab2/clean_ids.py
+setup: update
+	. env/bin/activate; pylint --generate-rcfile >> pylintrc
 
-test: lint
-	. env/bin/activate && pytest -vv tests
+pipeline/logs:
+	mkdir -p pipeline/logs
+
+lint:
+	. env/bin/activate; pylint bin/clean_ids.py
+	. env/bin/activate; pylint bin/extract_transcripts.py
+
+test: pipeline/logs lint
+	. env/bin/activate; pytest -vv tests
