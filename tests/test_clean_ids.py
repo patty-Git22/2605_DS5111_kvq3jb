@@ -1,7 +1,7 @@
 import sys
 import io
 import pytest
-from lab2.clean_ids import main, validate_id
+from bin.clean_ids import main, validate_id
 
 
 def test_script_execution(monkeypatch, capsys):
