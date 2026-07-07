@@ -7,14 +7,10 @@ import logging
 from dotenv import load_dotenv
 from google import genai
 from google.genai import types
-
+from lib.logging_config import setup_logging
 load_dotenv()
 
-logging.basicConfig(
-    filename='pipeline/logs/pipeline_audit.log',
-    level=logging.INFO,
-    format='%(asctime)s - %(levelname)s - %(message)s'
-)
+setup_logging()
 
 # Task 1: validate key and init client
 api_key = os.getenv("GEMINI_API_KEY")

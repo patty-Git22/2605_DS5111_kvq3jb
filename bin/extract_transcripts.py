@@ -10,20 +10,16 @@ import logging
 
 # BLANK 1: bring load_dotenv into scope so we can read the local .env file
 from dotenv import load_dotenv
-
 from youtube_transcript_api import YouTubeTranscriptApi
 from youtube_transcript_api.proxies import WebshareProxyConfig
+from lib.logging_config import setup_logging
 
 # BLANK 2: read .env from project root into the in-memory environment.
 # This is a no-op in CI/production, where the platform injects env vars natively.
 load_dotenv()
 
 # Direct logging statements to a shared audit log asset
-logging.basicConfig(
-    filename='pipeline/logs/pipeline_audit.log',
-    level=logging.INFO,
-    format='%(asctime)s - %(levelname)s - %(message)s'
-)
+setup_logging()
 
 
 def main():

@@ -4,7 +4,7 @@ pipeline's data contract, reporting per-row schema and type violations."""
 import sys
 import json
 
-def validate_payload(line_num, payload):
+def validate_payload(line_num, payload):  # pylint: disable=too-many-return-statements
     """
     Validates a single line of JSON data against the target API contract.
     Returns True if valid, False otherwise.
