@@ -4,10 +4,20 @@ import sys
 import os
 import json
 import logging
+from abc import ABC, abstractmethod
 from dotenv import load_dotenv
 from google import genai
 from google.genai import types
 from lib.logging_config import setup_logging
+
+
+class LLMStrategy(ABC):
+    """Abstract base class defining the enrichment strategy"""
+    @abstractmethod
+    def enrich(self, record: dict) -> dict:
+        """Abstract base class defining the enrichment strategy"""
+
+
 load_dotenv()
 
 setup_logging()
