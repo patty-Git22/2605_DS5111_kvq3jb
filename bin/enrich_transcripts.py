@@ -18,6 +18,63 @@ class LLMStrategy(ABC):
         """Abstract base class defining the enrichment strategy"""
 
 
+class GeminiStrategy(LLMStrategy):
+    """Gemini implementation of the LLM enrichment strategy."""
+
+    def __init__(self, gemini_api_key: str):
+        self.client = genai.Client(api_key=gemini_api_key)
+
+        self.response_schema = types.Schema(
+            type=types.Type.OBJECT,
+            properties={
+                "video_id": types.Schema(type=types.Type.STRING),
+                "cleaned_text": types.Schema(type=types.Type.STRING),
+                "tech_terms": types.Schema(
+                    type=types.Type.ARRAY,
+                    items=types.Schema(type=types.Type.STRING)
+                ),
+                "book_names": types.Schema(
+                    type=types.Type.ARRAY,
+                    items=types.Schema(type=types.Type.STRING)
+                ),
+            },
+            required=[
+                "video_id",
+                "cleaned_text",
+                "tech_terms",
+                "book_names"
+            ]
+        )
+
+        self.generate_config = types.GenerateContentConfig(
+            response_mime_type="application/json",
+            response_schema=self.response_schema
+        )
+
+    def enrich(self, record: dict) -> dict:
+        video_id = record.get("video_id", "unknown")
+        raw_text = record.get("raw_text", "")
+
+        prompt = (
+            "You are a data engineering assistant. Given the following raw lecture "
+            "transcript, return a JSON object with:\n"
+            "- video_id: the original video ID (string)\n"
+            "- cleaned_text: transcript with timestamps removed and cleaned up (string)\n"
+            "- tech_terms: technical terms, tools, or technologies mentioned "
+            "(array of strings)\n"
+            "- book_names: book titles mentioned (array of strings)\n\n"
+            f"video_id: {video_id}\nraw_text: {raw_text}"
+        )
+
+        response = self.client.models.generate_content(
+            model="gemini-2.5-flash",
+            contents=prompt,
+            config=self.generate_config
+        )
+
+        return json.loads(response.text)
+
+
 load_dotenv()
 
 setup_logging()
