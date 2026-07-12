@@ -66,13 +66,50 @@ class GeminiStrategy(LLMStrategy):
             f"video_id: {video_id}\nraw_text: {raw_text}"
         )
 
-        response = self.client.models.generate_content(
-            model="gemini-2.5-flash",
-            contents=prompt,
-            config=self.generate_config
-        )
+        try:
+            response = self.client.models.generate_content(
+                model="gemini-2.5-flash",
+                contents=prompt,
+                config=self.generate_config
+            )
+            return json.loads(response.text)
 
-        return json.loads(response.text)
+        except Exception as error:
+            raise RuntimeError(
+                f"Gemini enrichment failed for video {video_id}: {error}"
+            ) from error
+
+
+class TranscriptEnricher:
+    """Streams transcript records through an injected LLM strategy."""
+    def __init__(self, strategy: LLMStrategy):
+        self.strategy = strategy
+
+    def run_stream(self):
+        """Read JSONL from stdin and write enriched JSONL to stdout."""
+        for line in sys.stdin:
+            line = line.strip()
+            if not line:
+                continue
+            try:
+                record = json.loads(line)
+            except json.JSONDecodeError as error:
+                logging.error("Skipping malformed line: %s", error)
+                continue
+
+            video_id = record.get("video_id", "unknown")
+
+            try:
+                enriched_record = self.strategy.enrich(record)
+                sys.stdout.write(json.dumps(enriched_record) + "\n")
+                sys.stdout.flush()
+            except Exception as error:  # pylint: disable=broad-exception-caught
+                logging.error(
+                    "LLM enrichment failed for video %s: %s",
+                    video_id,
+                    error
+                )
+                continue
 
 
 load_dotenv()
