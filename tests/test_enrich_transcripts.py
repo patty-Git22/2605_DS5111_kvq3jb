@@ -5,7 +5,7 @@ import sys
 import io
 import json
 from google.genai.models import Models
-from bin.enrich_transcripts import main
+from bin.enrich_transcripts import LLMStrategy, TranscriptEnricher, main
 
 
 # 1. Build a dummy container mimicking the Gemini SDK response hierarchy
@@ -13,6 +13,43 @@ class MockGeminiResponse:  # pylint: disable=too-few-public-methods
     """Mimics the .text attribute on a real Gemini SDK response object."""
     def __init__(self, text_payload):
         self.text = text_payload
+
+class MockLLMStrategy(LLMStrategy):
+    """Deterministic fake strategy for testing without network calls."""
+
+    def enrich(self, record: dict) -> dict:
+        return {
+            "video_id": record["video_id"],
+            "cleaned_text": "mock cleaned text",
+            "tech_terms": ["mock frameworks"],
+            "book_names": []
+        }
+
+def test_transcript_enricher_uses_injected_strategy(monkeypatch, capsys):
+    """Verify TranscriptEnricher processes JSONL through an injected strategy."""
+    input_record = {
+        "video_id": "ds5111_v001",
+        "raw_text": "00:01 Welcome to class."
+    }
+
+    mock_stdin = io.StringIO(json.dumps(input_record) + "\n")
+    monkeypatch.setattr(sys, "stdin", mock_stdin)
+
+    strategy = MockLLMStrategy()
+    enricher = TranscriptEnricher(strategy)
+    enricher.run_stream()
+
+    captured = capsys.readouterr()
+    output_lines = captured.out.strip().splitlines()
+
+    assert len(output_lines) == 1
+
+    parsed_output = json.loads(output_lines[0])
+
+    assert parsed_output["video_id"] == "ds5111_v001"
+    assert parsed_output["cleaned_text"] == "mock cleaned text"
+    assert parsed_output["tech_terms"] == ["mock frameworks"]
+    assert parsed_output["book_names"] == []
 
 
 def test_enrich_transcripts_streaming_pipeline(monkeypatch, capsys):
@@ -41,9 +78,10 @@ def test_enrich_transcripts_streaming_pipeline(monkeypatch, capsys):
     }
     mock_stdin = io.StringIO(json.dumps(mock_input_row) + "\n")
     monkeypatch.setattr(sys, "stdin", mock_stdin)
+    monkeypatch.setenv("GEMINI_API_KEY", "fake-test-key")
 
     # 4. Trigger the main pipeline script execution loop
-    main()
+    main(argv = [])
 
     # 5. Intercept the standard console text buffers
     captured = capsys.readouterr()
