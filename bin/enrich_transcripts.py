@@ -12,14 +12,14 @@ from google.genai import types
 from lib.logging_config import setup_logging
 
 
-class LLMStrategy(ABC):
+class LLMStrategy(ABC):  # pylint: disable=too-few-public-methods
     """Abstract base class defining the enrichment strategy"""
     @abstractmethod
     def enrich(self, record: dict) -> dict:
         """Abstract base class defining the enrichment strategy"""
 
 
-class GeminiStrategy(LLMStrategy):
+class GeminiStrategy(LLMStrategy):  # pylint: disable=too-few-public-methods
     """Gemini implementation of the LLM enrichment strategy."""
 
     def __init__(self, gemini_api_key: str):
@@ -81,7 +81,7 @@ class GeminiStrategy(LLMStrategy):
             ) from error
 
 
-class TranscriptEnricher:
+class TranscriptEnricher:  # pylint: disable=too-few-public-methods
     """Streams transcript records through an injected LLM strategy."""
     def __init__(self, strategy: LLMStrategy):
         self.strategy = strategy

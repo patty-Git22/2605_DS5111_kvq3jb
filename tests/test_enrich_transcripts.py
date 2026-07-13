@@ -14,7 +14,7 @@ class MockGeminiResponse:  # pylint: disable=too-few-public-methods
     def __init__(self, text_payload):
         self.text = text_payload
 
-class MockLLMStrategy(LLMStrategy):
+class MockLLMStrategy(LLMStrategy):  # pylint: disable=too-few-public-methods
     """Deterministic fake strategy for testing without network calls."""
 
     def enrich(self, record: dict) -> dict:
