@@ -117,13 +117,6 @@ load_dotenv()
 
 setup_logging()
 
-# Task 1: validate key and init client
-api_key = os.getenv("GEMINI_API_KEY")
-if not api_key:
-    logging.critical("GEMINI_API_KEY is not set. Aborting pipeline.")
-    sys.exit(1)
-
-client = genai.Client(api_key=api_key)
 
 # Task 2: schema contract
 response_schema = types.Schema(
@@ -162,20 +155,20 @@ def main(argv=None):
     )
     args = parser.parse_args(argv)
 
-    gemini_api_key = os.getenv("GEMINI_API_KEY")
-    if not gemini_api_key:
+    logging.info("Pipeline Step 2B (LLM Enrichment) started.")
+
+    api_key = os.getenv("GEMINI_API_KEY")
+    if not api_key:
         logging.critical("GEMINI_API_KEY is not set. Aborting pipeline.")
-        return 1
+        sys.exit(1)
 
     if args.engine == "gemini":
-        strategy = GeminiStrategy(gemini_api_key=gemini_api_key)
-    else:
-        raise ValueError(f"Unknown engine: {args.engine}")
+        selected_strategy = GeminiStrategy(api_key)
 
-    enricher = TranscriptEnricher(strategy=strategy)
+    enricher = TranscriptEnricher(selected_strategy)
     enricher.run_stream()
 
-    return 0
+    logging.info("Pipeline Step 2B (LLM Enrichment) finished.")
 
 
 if __name__ == '__main__':
