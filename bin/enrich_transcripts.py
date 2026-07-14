@@ -153,6 +153,7 @@ def main(argv=None):
         default="gemini",
         help="LLM enrichment strategy to use."
     )
+
     args = parser.parse_args(argv)
 
     logging.info("Pipeline Step 2B (LLM Enrichment) started.")
@@ -162,10 +163,10 @@ def main(argv=None):
         logging.critical("GEMINI_API_KEY is not set. Aborting pipeline.")
         sys.exit(1)
 
-    selected_strategy = GeminiStrategy(api_key)
+    strategies = {"gemini": GeminiStrategy}
+    selected_strategy = strategies[args.engine](api_key)
 
     enricher = TranscriptEnricher(selected_strategy)
-
     enricher.run_stream()
 
     logging.info("Pipeline Step 2B (LLM Enrichment) finished.")
