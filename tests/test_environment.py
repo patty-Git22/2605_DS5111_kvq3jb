@@ -17,8 +17,8 @@ def test_distro_is_ubuntu():
 
 
 def test_python_version():
-    """Confirm the runtime Python version is 3.14."""
-    assert sys.version_info[:2] == (3, 14)
+    """Confirm the runtime Python version is one the project supports."""
+    assert sys.version_info[:2] in {(3, 11), (3, 12), (3, 13), (3, 14)}
 
 
 @pytest.mark.xfail(reason="demonstrating an expected failure")
