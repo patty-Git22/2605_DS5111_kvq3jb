@@ -162,10 +162,10 @@ def main(argv=None):
         logging.critical("GEMINI_API_KEY is not set. Aborting pipeline.")
         sys.exit(1)
 
-    if args.engine == "gemini":
-        selected_strategy = GeminiStrategy(api_key)
+    selected_strategy = GeminiStrategy(api_key)
 
     enricher = TranscriptEnricher(selected_strategy)
+
     enricher.run_stream()
 
     logging.info("Pipeline Step 2B (LLM Enrichment) finished.")
