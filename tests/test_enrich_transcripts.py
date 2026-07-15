@@ -21,7 +21,7 @@ def test_enrich_transcripts_streaming_pipeline(monkeypatch, capsys):
     and streams verified JSON objects out to stdout without making live API network requests.
     """
     # 2. Mock out the core GenAI Client methods
-    def mock_generate_content(self, model, contents, config=None):  # pylint: disable=unused-argument
+    def mock_generate_content(self, model, contents, config=None):
         # Return a pre-baked, schema-compliant JSON string mimicking the model output
         mock_data = {
             "video_id": "ds5111_v001",
@@ -32,13 +32,14 @@ def test_enrich_transcripts_streaming_pipeline(monkeypatch, capsys):
         return MockGeminiResponse(json.dumps(mock_data))
 
     # Corrected Module Target: Patch the actual Models service class inside the SDK
+    from google.genai.models import Models
     monkeypatch.setattr(Models, "generate_content", mock_generate_content)
 
+    # Satisfy the api-key guard in main() without hitting the real API
+    monkeypatch.setenv("GEMINI_API_KEY", "test-dummy-key")
+
     # 3. Simulate your stream input pipeline using an in-memory text buffer
-    mock_input_row = {
-        "video_id": "ds5111_v001",
-        "raw_text": "00:01 Welcome to class. Today we are testing mock frameworks."
-    }
+    mock_input_row = {"video_id": "ds5111_v001", "raw_text": "00:01 Welcome to class. Today we are testing mock frameworks."}
     mock_stdin = io.StringIO(json.dumps(mock_input_row) + "\n")
     monkeypatch.setattr(sys, "stdin", mock_stdin)
 
