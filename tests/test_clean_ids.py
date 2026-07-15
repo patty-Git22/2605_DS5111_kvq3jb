@@ -1,10 +1,13 @@
+"""Tests for the clean_ids pipeline stage: ID validation logic and the
+stdin-to-stdout filtering behavior of main()."""
 import sys
 import io
 import pytest
-from lab2.clean_ids import main, validate_id
+from bin.clean_ids import main, validate_id
 
 
 def test_script_execution(monkeypatch, capsys):
+    """A valid ID followed by an invalid one should emit only the valid one."""
     # 1. Simulate the standard input data
     # We use io.StringIO to make a string act like a readable stream/file
     fake_input = io.StringIO("kcFsuxaJ1es\nasd123\n")
@@ -21,20 +24,26 @@ def test_script_execution(monkeypatch, capsys):
 
 
 def test_good_bad_good(monkeypatch, capsys):
+    """Valid, invalid, and valid IDs interleaved should emit only the two valid ones."""
     monkeypatch.setattr(sys, "stdin", io.StringIO("kcFsuxaJ1es\nasd123\nHn4tR8wZ0aF\n"))
     main()
     assert capsys.readouterr().out == "kcFsuxaJ1es\nHn4tR8wZ0aF\n"
 
 
 def test_only_bad_lines(monkeypatch, capsys):
+    """All-invalid input should emit nothing."""
     monkeypatch.setattr(sys, "stdin", io.StringIO("asd123\nxK9\n\n"))
     main()
     assert capsys.readouterr().out == ""
 
+
 def test_keyboard_interrupt_exits_cleanly(monkeypatch):
-    class InterruptingStdin:
+    """A KeyboardInterrupt during stdin iteration should exit cleanly with code 0."""
+    class InterruptingStdin:  # pylint: disable=too-few-public-methods
+        """Stdin stand-in that raises KeyboardInterrupt on the first iteration."""
         def __iter__(self):
             return self
+
         def __next__(self):
             raise KeyboardInterrupt
 
@@ -53,4 +62,5 @@ def test_keyboard_interrupt_exits_cleanly(monkeypatch):
     ("Hn4tR8wZ0aF", True),     # valid 11-char id
 ])
 def test_validate_id(value, expected):
+    """Validate a range of ID formats against the expected pass/fail outcome."""
     assert validate_id(value) == expected

@@ -7,22 +7,10 @@ import logging
 from dotenv import load_dotenv
 from google import genai
 from google.genai import types
-
+from lib.logging_config import setup_logging
 load_dotenv()
 
-logging.basicConfig(
-    filename='pipeline/logs/pipeline_audit.log',
-    level=logging.INFO,
-    format='%(asctime)s - %(levelname)s - %(message)s'
-)
-
-# Task 1: validate key and init client
-api_key = os.getenv("GEMINI_API_KEY")
-if not api_key:
-    logging.critical("GEMINI_API_KEY is not set. Aborting pipeline.")
-    sys.exit(1)
-
-client = genai.Client(api_key=api_key)
+setup_logging()
 
 # Task 2: schema contract
 response_schema = types.Schema(
@@ -47,9 +35,16 @@ generate_config = types.GenerateContentConfig(
     response_schema=response_schema
 )
 
-
 def main():
     """Stream-enrich stdin records and emit schema-compliant JSON to stdout."""
+    # Task 1: validate key and init client inside main so imports don't trigger exit
+    api_key = os.getenv("GEMINI_API_KEY")
+    if not api_key:
+        logging.critical("GEMINI_API_KEY is not set. Aborting pipeline.")
+        sys.exit(1)
+
+    client = genai.Client(api_key=api_key)
+
     logging.info("Pipeline Step 2B (LLM Enrichment) started.")
 
     for line in sys.stdin:
@@ -93,7 +88,6 @@ def main():
             continue
 
     logging.info("Pipeline Step 2B (LLM Enrichment) finished.")
-
 
 if __name__ == '__main__':
     main()

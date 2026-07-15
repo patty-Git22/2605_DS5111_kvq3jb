@@ -1,16 +1,22 @@
+"""Tests for the extract_transcripts pipeline stage, covering the happy
+path, error handling, empty-input skipping, and proxy configuration."""
+
 import sys
 import io
+import os
 import json
 import pytest
+
 from youtube_transcript_api import YouTubeTranscriptApi
 
 # Import the executable entry point from the pipeline package
 from bin.extract_transcripts import main
 
 
-class MockTranscriptContainer:
+class MockTranscriptContainer:  # pylint: disable=too-few-public-methods
     """Mimics the .to_raw_data() array output schema without hitting the network."""
     def to_raw_data(self):
+        """Return a single mock transcript row."""
         return [
             {"start": 10.5, "text": "Automated container tracking loop text entry."}
         ]
@@ -19,7 +25,7 @@ class MockTranscriptContainer:
 def test_extract_transcripts_main_pipeline_stream(monkeypatch, capsys):
     """Happy path: one valid ID in -> exactly one JSON Lines row out, no internet."""
     # 1. Swap the live fetch for a stub returning mock data
-    def stubbed_fetch_route(self, video_id):
+    def stubbed_fetch_route(self, video_id):  # pylint: disable=unused-argument
         return MockTranscriptContainer()
     monkeypatch.setattr(YouTubeTranscriptApi, "fetch", stubbed_fetch_route)
 
@@ -76,3 +82,43 @@ def test_extract_transcripts_skips_empty_input_line(monkeypatch, capsys):
     # The blank line should be skipped, so nothing is emitted
     captured_output = capsys.readouterr()
     assert captured_output.out.strip() == ""
+
+
+@pytest.mark.skipif(
+    not (os.getenv("WEBSHARE_USER") and os.getenv("WEBSHARE_PASSWORD")),
+    reason=(
+        "Webshare proxy credentials (WEBSHARE_USER/WEBSHARE_PASSWORD) "
+        "not configured in this environment"
+    )
+)
+
+def test_extract_transcripts_uses_proxy_when_configured(monkeypatch, capsys):  # pylint: disable=unused-argument
+    """When Webshare proxy credentials are present in the environment, the
+    pipeline should construct YouTubeTranscriptApi with a WebshareProxyConfig
+    rather than a direct/unproxied client."""
+    captured_kwargs = {}
+
+    class SpyYouTubeTranscriptApi:  # pylint: disable=too-few-public-methods
+        """Records the kwargs it was constructed with, then behaves like
+        the real client for the single fetch call in main()."""
+        def __init__(self, **kwargs):
+            """Capture constructor kwargs for assertion down the road. """
+            captured_kwargs.update(kwargs)
+
+        def fetch(self, video_id):  # pylint: disable=unused-argument
+            """Return a mock transcript regardless of the requested video id."""
+            return MockTranscriptContainer()
+
+    monkeypatch.setattr(
+        "bin.extract_transcripts.YouTubeTranscriptApi", SpyYouTubeTranscriptApi
+    )
+
+    mock_input_stream = io.StringIO("proxy_video_123\n")
+    monkeypatch.setattr(sys, "stdin", mock_input_stream)
+
+    main()
+
+    assert "proxy_config" in captured_kwargs, (
+        "Expected YouTubeTranscriptApi to be constructed with a proxy_config "
+        "when WEBSHARE_USER/WEBSHARE_PASSWORD are set."
+    )

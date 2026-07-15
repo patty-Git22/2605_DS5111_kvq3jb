@@ -1,8 +1,10 @@
+Pygments==2.20.0
 astroid==4.0.4
 certifi==2026.5.20
 charset-normalizer==3.4.7
 defusedxml==0.7.1
 dill==0.4.1
+google-genai==2.9.0
 idna==3.18
 iniconfig==2.3.0
 isort==8.0.1
@@ -12,7 +14,6 @@ packaging==26.2
 pandas==3.0.3
 platformdirs==4.10.0
 pluggy==1.6.0
-Pygments==2.20.0
 pylint==4.0.5
 pytest==9.0.3
 python-dateutil==2.9.0.post0
