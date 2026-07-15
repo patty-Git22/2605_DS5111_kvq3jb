@@ -37,7 +37,7 @@ generate_config = types.GenerateContentConfig(
 
 def main():
     """Stream-enrich stdin records and emit schema-compliant JSON to stdout."""
-    # TODO 1: validate key and init client inside main so imports don't trigger exit
+    # Task 1: validate key and init client inside main so imports don't trigger exit
     api_key = os.getenv("GEMINI_API_KEY")
     if not api_key:
         logging.critical("GEMINI_API_KEY is not set. Aborting pipeline.")
