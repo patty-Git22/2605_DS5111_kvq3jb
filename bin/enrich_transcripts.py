@@ -171,13 +171,5 @@ def main(argv=None):
 
     logging.info("Pipeline Step 2B (LLM Enrichment) finished.")
 
-
-if __name__ == '__main__':
-    sys.exit(main())
-    enricher.run_stream()
-
-    logging.info("Pipeline Step 2B (LLM Enrichment) finished.")
-
-
 if __name__ == '__main__':
     sys.exit(main())
