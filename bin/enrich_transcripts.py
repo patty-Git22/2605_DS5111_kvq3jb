@@ -9,8 +9,14 @@ from abc import ABC, abstractmethod
 from dotenv import load_dotenv
 from google import genai
 from google.genai import types
-from lib.logging_config import setup_logging
 
+load_dotenv()
+
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s - %(levelname)s - %(message)s",
+    datefmt="%Y-%m-%d %H:%M:%S"
+)
 
 class LLMStrategy(ABC):  # pylint: disable=too-few-public-methods
     """Abstract base class defining the enrichment strategy"""
@@ -112,12 +118,6 @@ class TranscriptEnricher:  # pylint: disable=too-few-public-methods
                 )
                 continue
 
-
-load_dotenv()
-
-setup_logging()
-
-
 # Task 2: schema contract
 response_schema = types.Schema(
     type=types.Type.OBJECT,
@@ -167,6 +167,13 @@ def main(argv=None):
     selected_strategy = strategies[args.engine](api_key)
 
     enricher = TranscriptEnricher(selected_strategy)
+    enricher.run_stream()
+
+    logging.info("Pipeline Step 2B (LLM Enrichment) finished.")
+
+
+if __name__ == '__main__':
+    sys.exit(main())
     enricher.run_stream()
 
     logging.info("Pipeline Step 2B (LLM Enrichment) finished.")
