@@ -217,3 +217,7 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Project-specific: un-ignore our own lib/ directory (not a build artifact)
+!lib/
+!lib/**

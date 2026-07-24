@@ -1,15 +1,17 @@
 #!/usr/bin/env python3
+"""Validate enriched transcript JSON Lines records from stdin against the
+pipeline's data contract, reporting per-row schema and type violations."""
 import sys
 import json
 
-def validate_payload(line_num, payload):
+def validate_payload(line_num, payload):  # pylint: disable=too-many-return-statements
     """
     Validates a single line of JSON data against the target API contract.
     Returns True if valid, False otherwise.
     """
     required_fields = ["video_id", "cleaned_text"]
     optional_fields = ["tech_terms", "book_names"]
-    
+
     # 1. Enforce top-level dictionary data structure
     if not isinstance(payload, dict):
         print(f"❌ [Row {line_num}] Schema Failure: Record is not a valid JSON Object.")
@@ -25,7 +27,7 @@ def validate_payload(line_num, payload):
     if not isinstance(payload["video_id"], str) or not payload["video_id"].strip():
         print(f"❌ [Row {line_num}] Type Failure: 'video_id' must be a non-empty STRING.")
         return False
-        
+
     if not isinstance(payload["cleaned_text"], str):
         print(f"❌ [Row {line_num}] Type Failure: 'cleaned_text' must be a STRING.")
         return False
@@ -36,15 +38,21 @@ def validate_payload(line_num, payload):
             if not isinstance(payload[field], list):
                 print(f"❌ [Row {line_num}] Type Failure: '{field}' must be an ARRAY (Python list).")
                 return False
-            
+
             # Ensure every element inside the array is a string primitive
             if not all(isinstance(item, str) for item in payload[field]):
-                print(f"❌ [Row {line_num}] Type Failure: All elements inside '{field}' must be STRINGS.")
+                print(
+                    f"❌ [Row {line_num}] Type Failure: "
+                    f"All elements inside '{field}' must be STRINGS."
+                )
                 return False
-                
+
     return True
 
 def main():
+    """Read JSON Lines records from stdin, validate each against the
+    pipeline's data contract, print a summary, and exit non-zero on
+    any schema or syntax failure."""
     print("🚀 Starting pipeline data contract validation...")
     total_records = 0
     failed_records = 0
@@ -53,7 +61,7 @@ def main():
         line = line.strip()
         if not line:
             continue
-            
+
         total_records += 1
         try:
             data = json.loads(line)
@@ -71,7 +79,10 @@ def main():
         print(f"🔴 Failure: {failed_records}/{total_records} records violated the schema contract.")
         sys.exit(1)
     else:
-        print(f"🟢 Success: All {total_records} records successfully match the required data contract!")
+        print(
+            f"🟢 Success: All {total_records} records "
+            "successfully match the required data contract!"
+        )
         sys.exit(0)
 
 if __name__ == '__main__':
