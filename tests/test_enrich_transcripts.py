@@ -57,7 +57,8 @@ def test_enrich_transcripts_streaming_pipeline(monkeypatch, capsys):
     Verifies that main() reads mock lines from stdin, calls the Gemini client structure,
     and streams verified JSON objects out to stdout without making live API network requests.
     """
-    def mock_generate_content(self, model, contents, config=None):  # pylint: disable=unused-argument
+    # pylint: disable=unused-argument
+    def mock_generate_content(self, model, contents, config=None):
         mock_data = {
             "video_id": "ds5111_v001",
             "cleaned_text": "Welcome to class. Today we are testing mock frameworks.",

@@ -24,3 +24,4 @@ tomlkit==0.15.0
 urllib3==2.7.0
 youtube-transcript-api==1.2.4
 google-genai==2.9.0
+snowflake-connector-python==3.12.3
