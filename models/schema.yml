@@ -10,7 +10,7 @@ models:
   - name: dim_videos
     tests:
       - dbt_expectations.expect_table_columns_to_match_set:
-          column_list: ["video_id", "channel_id", "upload_date"]
+          column_list: ["video_id", "cleaned_text", "tech_term_count", "book_name_count", "word_count", "char_count", "processed_at"]
     columns:
       - name: video_id
         tests:
@@ -24,7 +24,7 @@ models:
           - relationships:
               to: ref('dim_videos')
               field: video_id
-      - name: book_title
+      - name: book_name
         tests:
           - dbt_expectations.expect_column_value_lengths_to_be_between:
               min_value: 2
