@@ -1,0 +1,31 @@
+models:
+  - name: stg_youtube_transcripts
+    columns:
+      - name: video_id
+        tests:
+          - not_null
+          - dbt_expectations.expect_column_values_to_match_regex:
+              regex: "^[A-Za-z0-9_-]{11}$"
+
+  - name: dim_videos
+    tests:
+      - dbt_expectations.expect_table_columns_to_match_set:
+          column_list: ["video_id", "channel_id", "upload_date"]
+    columns:
+      - name: video_id
+        tests:
+          - unique
+          - not_null
+
+  - name: fct_book_mentions
+    columns:
+      - name: video_id
+        tests:
+          - relationships:
+              to: ref('dim_videos')
+              field: video_id
+      - name: book_title
+        tests:
+          - dbt_expectations.expect_column_value_lengths_to_be_between:
+              min_value: 2
+              max_value: 250
