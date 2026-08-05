@@ -40,5 +40,5 @@ models:
       - name: term_name
         tests:
           - dbt_expectations.expect_column_value_lengths_to_be_between:
-              min_value: 2
+              min_value: 50
               max_value: 250
