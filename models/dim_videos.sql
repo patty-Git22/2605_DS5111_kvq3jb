@@ -1,0 +1,12 @@
+{{ config(materialized='table') }}
+
+SELECT
+    VIDEO_ID,
+    CLEANED_TEXT,
+    ARRAY_SIZE(TECH_TERMS_ARRAY)        AS TECH_TERM_COUNT,
+    ARRAY_SIZE(BOOK_NAMES_ARRAY)        AS BOOK_NAME_COUNT,
+    ARRAY_SIZE(SPLIT(CLEANED_TEXT, ' ')) AS WORD_COUNT,
+    LENGTH(CLEANED_TEXT)                 AS CHAR_COUNT,
+    INSERTED_AT                          AS PROCESSED_AT
+FROM {{ ref('stg_youtube_transcripts') }}
+QUALIFY ROW_NUMBER() OVER (PARTITION BY VIDEO_ID ORDER BY INSERTED_AT DESC) = 1
